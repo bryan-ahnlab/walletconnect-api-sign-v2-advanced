@@ -31,6 +31,21 @@ export const getClient = async () => {
   }
 };
 
+const subscribeToEvents = async (
+  signClient: InstanceType<typeof SignClient> | null
+) => {
+  if (!signClient)
+    throw Error("Unable to subscribe to events. Client does not exist.");
+  try {
+    signClient.on("session_delete", () => {
+      console.info("The user has disconnected the session from their wallet.");
+      reset();
+    });
+  } catch (error) {
+    console.error(`subscribeToEvents: ${JSON.stringify(error)}`);
+  }
+};
+
 export const handleConnect = async () => {
   try {
     const signClient = await getClient();
@@ -60,22 +75,26 @@ export const handleConnect = async () => {
         const sessionNamespace = await approval();
         onSessionConnected(sessionNamespace);
         web3Modal.closeModal();
+        console.info(`handleConnect: Connected`);
+        // alert("Connected");
       }
     }
   } catch (error) {
     console.error(`handleConnect: ${JSON.stringify(error)}`);
+    reset();
   }
 };
 
 export const onSessionConnected = (sessionNamespace: SessionTypes.Struct) => {
   try {
-    console.info(`session: ${sessionNamespace}`);
+    console.info(`session: ${JSON.stringify(sessionNamespace)}`);
     console.info(`account: ${sessionNamespace.namespaces.eip155.accounts[0]}`);
     session = sessionNamespace;
     account = sessionNamespace.namespaces.eip155.accounts[0];
   } catch (error) {
+    session = null;
+    account = null;
     console.error(`onSessionConnected: ${JSON.stringify(error)}`);
-    return { session: null, account: null };
   }
 };
 
@@ -88,6 +107,7 @@ export const handleDisconnect = async () => {
       });
       reset();
       console.info(`handleDisconnect: Disconnected`);
+      // alert("Disconnected");
     }
   } catch (error) {
     console.error(`handleDisconnect: ${JSON.stringify(error)}`);
@@ -100,43 +120,27 @@ export const reset = () => {
   window.indexedDB.deleteDatabase("WALLET_CONNECT_V2_INDEXED_DB");
 };
 
-const subscribeToEvents = async (
-  signClient: InstanceType<typeof SignClient> | null
-) => {
-  if (!signClient)
-    throw Error("Unable to subscribe to events. Client does not exist.");
-  try {
-    signClient.on("session_delete", () => {
-      console.info("The user has disconnected the session from their wallet.");
-      reset();
-    });
-  } catch (error) {
-    console.error(`subscribeToEvents: ${JSON.stringify(error)}`);
-  }
-};
-
-/* Sample transaction */
-const tx = {
-  from: account,
-  to: "0xBDE1EAE59cE082505bB73fedBa56252b1b9C60Ce",
-  data: "0x",
-  /* gasPrice: "0x029104e28c",
-  gasLimit: "0x5208", */
-  value: "0x00",
-};
-
 export const handleRequestTransaction = async () => {
   try {
-    if (signClient && session) {
+    /* Sample transaction */
+    const tx = {
+      from: account,
+      to: process.env.REACT_APP_TRANSACTION_TEST_ACCOUNT || "",
+      data: process.env.REACT_APP_TRANSACTION_TEST_DATA || "",
+      gasLimit: process.env.REACT_APP_TRANSACTION_TEST_GAS_LIMIT || "",
+      value: process.env.REACT_APP_TRANSACTION_TEST_VALUE || "",
+    };
+    if (signClient && session && account) {
       const response = await signClient.request({
         topic: session.topic,
         chainId: process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID || "",
         request: {
-          method: "eth_sendTransaction",
+          method: process.env.REACT_APP_TRANSACTION_TEST_METHOD || "",
           params: [tx],
         },
       });
       console.info(`requestTransaction: ${response}`);
+      // alert("Request Transaction");
     }
   } catch (error) {
     console.error(`requestTransaction: ${JSON.stringify(error)}`);

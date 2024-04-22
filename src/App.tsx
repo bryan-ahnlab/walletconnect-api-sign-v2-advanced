@@ -30,7 +30,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Sign v2 Standalone</h1>
+      <h1>Wallet Connect v2.0 Sign SDK Sample Test</h1>
+
       <div
         style={{
           display: "flex",
@@ -40,21 +41,45 @@ function App() {
         }}
       >
         <button
-          style={{ width: "80%", height: "3rem" }}
+          style={{
+            width: "100%",
+            minHeight: "3rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "0.5rem",
+            padding: "0.5rem",
+          }}
           onClick={() => handleConnect()}
           disabled={!curSignClient}
         >
           Connect
         </button>
         <button
-          style={{ width: "80%", height: "3rem" }}
+          style={{
+            width: "100%",
+            minHeight: "3rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "0.5rem",
+            padding: "0.5rem",
+          }}
           onClick={() => handleDisconnect()}
           disabled={!curSignClient}
         >
           Disconnect
         </button>
         <button
-          style={{ width: "80%", height: "3rem" }}
+          style={{
+            width: "100%",
+            minHeight: "3rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "0.5rem",
+            padding: "0.5rem",
+          }}
           onClick={() => handleRequestTransaction()}
           disabled={!curSignClient}
         >
