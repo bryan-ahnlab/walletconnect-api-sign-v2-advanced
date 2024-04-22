@@ -9,9 +9,9 @@ let account: string | null = null;
 let web3Modal: InstanceType<typeof Web3Modal> | null = null;
 
 web3Modal = new Web3Modal({
+  walletConnectVersion: 2,
   projectId: process.env.REACT_APP_PROJECT_ID || "", // Add Project ID
   standaloneChains: [process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID || ""], // Add Chain ID
-  walletConnectVersion: 2,
   explorerRecommendedWalletIds: [process.env.REACT_APP_WALLET_ID || ""], // Add ABC Wallet ID
 });
 
@@ -69,7 +69,7 @@ export const handleConnect = async () => {
 
 export const onSessionConnected = (sessionNamespace: SessionTypes.Struct) => {
   try {
-    console.info(`session: ${JSON.stringify(sessionNamespace)}`);
+    console.info(`session: ${sessionNamespace}`);
     console.info(`account: ${sessionNamespace.namespaces.eip155.accounts[0]}`);
     session = sessionNamespace;
     account = sessionNamespace.namespaces.eip155.accounts[0];
@@ -136,7 +136,7 @@ export const handleRequestTransaction = async () => {
           params: [tx],
         },
       });
-      console.info(`requestTransaction: ${JSON.stringify(response)}`);
+      console.info(`requestTransaction: ${response}`);
     }
   } catch (error) {
     console.error(`requestTransaction: ${JSON.stringify(error)}`);
