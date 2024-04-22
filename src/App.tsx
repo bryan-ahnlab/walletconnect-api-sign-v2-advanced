@@ -49,6 +49,7 @@ function App() {
             fontWeight: "bold",
             borderRadius: "0.5rem",
             padding: "0.5rem",
+            wordBreak: "break-all",
           }}
           onClick={() => handleConnect()}
           disabled={!curSignClient}
@@ -64,6 +65,7 @@ function App() {
             fontWeight: "bold",
             borderRadius: "0.5rem",
             padding: "0.5rem",
+            wordBreak: "break-all",
           }}
           onClick={() => handleDisconnect()}
           disabled={!curSignClient}
@@ -79,6 +81,7 @@ function App() {
             fontWeight: "bold",
             borderRadius: "0.5rem",
             padding: "0.5rem",
+            wordBreak: "break-all",
           }}
           onClick={() => handleRequestTransaction()}
           disabled={!curSignClient}

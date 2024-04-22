@@ -97,8 +97,7 @@ export class WalletConnect {
       this.session = sessionNamespace;
       this.account = sessionNamespace.namespaces.eip155.accounts[0];
     } catch (error) {
-      this.session = null;
-      this.account = null;
+      this.reset();
       console.error(`onSessionConnected: ${JSON.stringify(error)}`);
     }
   }

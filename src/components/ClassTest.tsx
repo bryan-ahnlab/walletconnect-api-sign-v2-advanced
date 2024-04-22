@@ -39,6 +39,7 @@ function ClassTest() {
             fontWeight: "bold",
             borderRadius: "0.5rem",
             padding: "0.5rem",
+            wordBreak: "break-all",
           }}
           onClick={() => curWalletConnect?.handleConnect()}
           disabled={!curWalletConnect}
@@ -54,6 +55,7 @@ function ClassTest() {
             fontWeight: "bold",
             borderRadius: "0.5rem",
             padding: "0.5rem",
+            wordBreak: "break-all",
           }}
           onClick={() => curWalletConnect?.handleDisconnect()}
           disabled={!curWalletConnect}
@@ -69,6 +71,7 @@ function ClassTest() {
             fontWeight: "bold",
             borderRadius: "0.5rem",
             padding: "0.5rem",
+            wordBreak: "break-all",
           }}
           onClick={() => curWalletConnect?.handleRequestTransaction()}
           disabled={!curWalletConnect}
