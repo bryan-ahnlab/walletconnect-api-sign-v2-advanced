@@ -60,11 +60,11 @@ export class WalletConnect {
         const proposalNamespace = {
           [process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""]: {
             methods: [
-              "eth_sendTransaction",
-              "eth_signTransaction",
-              "eth_sign",
               "personal_sign",
+              "eth_sign",
+              "eth_signTransaction",
               "eth_signTypedData",
+              "eth_sendTransaction",
             ],
             chains: [
               `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
@@ -105,10 +105,12 @@ export class WalletConnect {
         }`
       );
       this.session = sessionNamespace;
-      this.account =
-        sessionNamespace.namespaces[
-          process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""
-        ].accounts[0];
+      this.account = sessionNamespace.namespaces[
+        process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""
+      ].accounts[0]
+        .split(":")
+        .slice(2)
+        .join(":");
     } catch (error) {
       this.reset();
       console.error(`onSessionConnected: ${JSON.stringify(error)}`);
@@ -137,7 +139,179 @@ export class WalletConnect {
     window.indexedDB.deleteDatabase("WALLET_CONNECT_V2_INDEXED_DB");
   }
 
-  public async handleRequestTransaction() {
+  public async handlePersonalSign() {
+    try {
+      /* Sample transaction */
+      const tx = {
+        message: "0xdeadbeaf",
+        address: this.account,
+      };
+      if (this.signClient && this.session && this.account) {
+        const response = await this.signClient.request({
+          topic: this.session.topic,
+          chainId:
+            `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+            "",
+          request: {
+            method: "personal_sign",
+            params: [tx.message, tx.address],
+          },
+        });
+        console.info(`handlePersonalSign: ${response}`);
+        // alert("Personal Sign");
+      }
+    } catch (error) {
+      console.error(`handlePersonalSign: ${JSON.stringify(error)}`);
+    }
+  }
+
+  public async handleEthSign() {
+    try {
+      /* Sample transaction */
+      const tx = {
+        address: this.account,
+        message: "0xdeadbeaf",
+      };
+      if (this.signClient && this.session && this.account) {
+        const response = await this.signClient.request({
+          topic: this.session.topic,
+          chainId:
+            `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+            "",
+          request: {
+            method: "eth_sign",
+            params: [tx.address, tx.message],
+          },
+        });
+        console.info(`handleEthSign: ${response}`);
+        // alert("ETH Sign");
+      }
+    } catch (error) {
+      console.error(`handleEthSign: ${JSON.stringify(error)}`);
+    }
+  }
+
+  public async handleEthSignTransaction() {
+    try {
+      /* Sample transaction */
+      const tx = {
+        from: this.account,
+        to: process.env.REACT_APP_TRANSACTION_TEST_ACCOUNT || "",
+        data: "0x",
+        /* gas: "0x76c0", */
+        /* gasPrice: "0x9184e72a000", */
+        value: "0x00",
+        /* nonce: 0x117 */
+      };
+      if (this.signClient && this.session && this.account) {
+        const response = await this.signClient.request({
+          topic: this.session.topic,
+          chainId:
+            `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+            "",
+          request: {
+            method: "eth_signTransaction",
+            params: [tx],
+          },
+        });
+        console.info(`handleEthSignTransaction: ${response}`);
+        // alert("ETH Sign Transaction");
+      }
+    } catch (error) {
+      console.error(`handleEthSignTransaction: ${JSON.stringify(error)}`);
+    }
+  }
+
+  public async handleEthSignTypedData() {
+    try {
+      /* Sample transaction */
+      const tx = {
+        address: this.account,
+        message: {
+          types: {
+            EIP712Domain: [
+              {
+                name: "name",
+                type: "string",
+              },
+              {
+                name: "version",
+                type: "string",
+              },
+              {
+                name: "chainId",
+                type: "uint256",
+              },
+              {
+                name: "verifyingContract",
+                type: "address",
+              },
+            ],
+            Person: [
+              {
+                name: "name",
+                type: "string",
+              },
+              {
+                name: "wallet",
+                type: "address",
+              },
+            ],
+            Mail: [
+              {
+                name: "from",
+                type: "Person",
+              },
+              {
+                name: "to",
+                type: "Person",
+              },
+              {
+                name: "contents",
+                type: "string",
+              },
+            ],
+          },
+          primaryType: "Mail",
+          domain: {
+            name: "Ether Mail",
+            version: "1",
+            chainId: 1,
+            verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
+          },
+          message: {
+            from: {
+              name: "Cow",
+              wallet: "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+            },
+            to: {
+              name: "Bob",
+              wallet: "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+            },
+            contents: "Hello, Bob!",
+          },
+        },
+      };
+      if (this.signClient && this.session && this.account) {
+        const response = await this.signClient.request({
+          topic: this.session.topic,
+          chainId:
+            `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+            "",
+          request: {
+            method: "eth_signTypedData",
+            params: [tx.address, tx.message],
+          },
+        });
+        console.info(`handleEthSignTypedData: ${response}`);
+        // alert("ETH Sign Typed Data");
+      }
+    } catch (error) {
+      console.error(`handleEthSignTypedData: ${JSON.stringify(error)}`);
+    }
+  }
+
+  public async handleEthSendTransaction() {
     try {
       /* Sample transaction */
       const tx = {
@@ -159,10 +333,10 @@ export class WalletConnect {
           },
         });
         console.info(`requestTransaction: ${response}`);
-        // alert("Request Transaction");
+        // alert("ETH Send Transaction");
       }
     } catch (error) {
-      console.error(`handleRequestTransaction: ${JSON.stringify(error)}`);
+      console.error(`handleEthSendTransaction: ${JSON.stringify(error)}`);
     }
   }
 }

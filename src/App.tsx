@@ -70,10 +70,74 @@ function App() {
             padding: "0.5rem",
             wordBreak: "break-all",
           }}
-          onClick={() => curWalletConnect?.handleRequestTransaction()}
+          onClick={() => curWalletConnect?.handlePersonalSign()}
           disabled={!curWalletConnect}
         >
-          Request Transaction
+          Ethereum Personal Sign
+        </button>
+        <button
+          style={{
+            width: "100%",
+            minHeight: "3rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "0.5rem",
+            padding: "0.5rem",
+            wordBreak: "break-all",
+          }}
+          onClick={() => curWalletConnect?.handleEthSign()}
+          disabled={!curWalletConnect}
+        >
+          Ethereum Sign
+        </button>
+        <button
+          style={{
+            width: "100%",
+            minHeight: "3rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "0.5rem",
+            padding: "0.5rem",
+            wordBreak: "break-all",
+          }}
+          onClick={() => curWalletConnect?.handleEthSignTransaction()}
+          disabled={!curWalletConnect}
+        >
+          Ethereum Sign Transaction
+        </button>
+        <button
+          style={{
+            width: "100%",
+            minHeight: "3rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "0.5rem",
+            padding: "0.5rem",
+            wordBreak: "break-all",
+          }}
+          onClick={() => curWalletConnect?.handleEthSignTypedData()}
+          disabled={!curWalletConnect}
+        >
+          Ethereum Sign Typed Data
+        </button>
+        <button
+          style={{
+            width: "100%",
+            minHeight: "3rem",
+            cursor: "pointer",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            borderRadius: "0.5rem",
+            padding: "0.5rem",
+            wordBreak: "break-all",
+          }}
+          onClick={() => curWalletConnect?.handleEthSendTransaction()}
+          disabled={!curWalletConnect}
+        >
+          Ethereum Send Transaction
         </button>
       </div>
     </div>
