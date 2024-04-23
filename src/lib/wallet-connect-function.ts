@@ -11,7 +11,10 @@ let web3Modal: InstanceType<typeof Web3Modal> | null = null;
 web3Modal = new Web3Modal({
   walletConnectVersion: 2,
   projectId: process.env.REACT_APP_PROJECT_ID || "", // Add Project ID
-  standaloneChains: [process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID || ""], // Add Chain ID
+  standaloneChains: [
+    `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+      "",
+  ], // Add Chain ID
   explorerRecommendedWalletIds: [process.env.REACT_APP_WALLET_ID || ""], // Add ABC Wallet ID
 });
 
@@ -52,7 +55,7 @@ export const handleConnect = async () => {
 
     if (signClient) {
       const proposalNamespace = {
-        eip155: {
+        [process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""]: {
           methods: [
             "eth_sendTransaction",
             "eth_signTransaction",
@@ -60,7 +63,10 @@ export const handleConnect = async () => {
             "personal_sign",
             "eth_signTypedData",
           ],
-          chains: [process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID || ""],
+          chains: [
+            `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+              "",
+          ],
           events: ["connect", "disconnect"],
         },
       };
@@ -88,9 +94,18 @@ export const handleConnect = async () => {
 export const onSessionConnected = (sessionNamespace: SessionTypes.Struct) => {
   try {
     console.info(`session: ${JSON.stringify(sessionNamespace)}`);
-    console.info(`account: ${sessionNamespace.namespaces.eip155.accounts[0]}`);
+    console.info(
+      `account: ${
+        sessionNamespace.namespaces[
+          process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""
+        ].accounts[0]
+      }`
+    );
     session = sessionNamespace;
-    account = sessionNamespace.namespaces.eip155.accounts[0];
+    account =
+      sessionNamespace.namespaces[
+        process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""
+      ].accounts[0];
   } catch (error) {
     session = null;
     account = null;
@@ -126,16 +141,18 @@ export const handleRequestTransaction = async () => {
     const tx = {
       from: account,
       to: process.env.REACT_APP_TRANSACTION_TEST_ACCOUNT || "",
-      data: process.env.REACT_APP_TRANSACTION_TEST_DATA || "",
-      gasLimit: process.env.REACT_APP_TRANSACTION_TEST_GAS_LIMIT || "",
-      value: process.env.REACT_APP_TRANSACTION_TEST_VALUE || "",
+      data: "0x",
+      gasLimit: "0x5208",
+      value: "0x00",
     };
     if (signClient && session && account) {
       const response = await signClient.request({
         topic: session.topic,
-        chainId: process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID || "",
+        chainId:
+          `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+          "",
         request: {
-          method: process.env.REACT_APP_TRANSACTION_TEST_METHOD || "",
+          method: "eth_sendTransaction",
           params: [tx],
         },
       });
