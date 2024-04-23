@@ -1,37 +1,24 @@
 import React from "react";
-import "./App.css";
 
 import { useState, useEffect } from "react";
-import {
-  getClient,
-  handleConnect,
-  handleDisconnect,
-  handleRequestTransaction,
-} from "./lib/wallet-connect";
-import { SignClient } from "@walletconnect/sign-client";
+import { WalletConnect } from "./lib/wallet-connect";
 
 function App() {
-  const [curSignClient, setCurSignClient] = useState<InstanceType<
-    typeof SignClient
-  > | null>(null);
+  const [curWalletConnect, setCurWalletConnect] =
+    useState<WalletConnect | null>(null);
 
   useEffect(() => {
-    if (!curSignClient) {
-      const initializeClient = async () => {
-        const signClient = await getClient();
-        if (signClient) {
-          setCurSignClient(signClient);
-        }
-      };
-      initializeClient();
-    }
-    console.log("curSignClient: ", curSignClient);
-  }, [curSignClient]);
+    const walletConnect = new WalletConnect();
+    setCurWalletConnect(walletConnect);
+
+    return () => {
+      walletConnect.handleDisconnect();
+    };
+  }, []);
 
   return (
-    <div className="App">
-      <h1>Wallet Connect v2.0 Sign SDK Sample Test</h1>
-
+    <div className="App" style={{ textAlign: "center", padding: "0 2rem" }}>
+      <h1>Wallet Connect v2.0 Sign SDK Sample</h1>
       <div
         style={{
           display: "flex",
@@ -51,8 +38,8 @@ function App() {
             padding: "0.5rem",
             wordBreak: "break-all",
           }}
-          onClick={() => handleConnect()}
-          disabled={!curSignClient}
+          onClick={() => curWalletConnect?.handleConnect()}
+          disabled={!curWalletConnect}
         >
           Connect
         </button>
@@ -67,8 +54,8 @@ function App() {
             padding: "0.5rem",
             wordBreak: "break-all",
           }}
-          onClick={() => handleDisconnect()}
-          disabled={!curSignClient}
+          onClick={() => curWalletConnect?.handleDisconnect()}
+          disabled={!curWalletConnect}
         >
           Disconnect
         </button>
@@ -83,8 +70,8 @@ function App() {
             padding: "0.5rem",
             wordBreak: "break-all",
           }}
-          onClick={() => handleRequestTransaction()}
-          disabled={!curSignClient}
+          onClick={() => curWalletConnect?.handleRequestTransaction()}
+          disabled={!curWalletConnect}
         >
           Request Transaction
         </button>
