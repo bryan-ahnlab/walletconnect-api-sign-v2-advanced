@@ -14,7 +14,7 @@ export class WalletConnect {
       walletConnectVersion: 2,
       projectId: process.env.REACT_APP_PROJECT_ID || "", // Add Project ID
       standaloneChains: [
-        `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+        `${process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_APTOS_MAINNET_CHAIN_ID}` ||
           "",
       ], // Add Chain ID
       explorerRecommendedWalletIds: [process.env.REACT_APP_WALLET_ID || ""], // Add ABC Wallet ID
@@ -58,7 +58,7 @@ export class WalletConnect {
 
       if (signClient) {
         const proposalNamespace = {
-          [process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""]: {
+          [process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL || ""]: {
             methods: [
               "personal_sign",
               "eth_sign",
@@ -67,7 +67,7 @@ export class WalletConnect {
               "eth_sendTransaction",
             ],
             chains: [
-              `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
+              `${process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_APTOS_MAINNET_CHAIN_ID}` ||
                 "",
             ],
             events: ["chainChanged", "accountsChanged"],
@@ -100,13 +100,13 @@ export class WalletConnect {
       console.info(
         `account: ${
           sessionNamespace.namespaces[
-            process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""
+            process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL || ""
           ].accounts[0]
         }`
       );
       this.session = sessionNamespace;
       this.account = sessionNamespace.namespaces[
-        process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""
+        process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL || ""
       ].accounts[0]
         .split(":")
         .slice(2)
@@ -337,6 +337,92 @@ export class WalletConnect {
       }
     } catch (error) {
       console.error(`handleEthSendTransaction: ${JSON.stringify(error)}`);
+    }
+  }
+
+  public async handleAptosSignMessage() {
+    try {
+      /* Sample transaction */
+      const tx = {
+        message: "Hello from Aptos Wallet Adapter",
+        nonce: "random_string",
+      };
+      if (this.signClient && this.session && this.account) {
+        const response = await this.signClient.request({
+          topic: this.session.topic,
+          chainId:
+            `${process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_APTOS_MAINNET_CHAIN_ID}` ||
+            "",
+          request: {
+            method: "aptos_signMessage",
+            params: [tx],
+          },
+        });
+        console.info(`handleAptosSignMessage: ${response}`);
+        // alert("APTOS Sign Message")
+      }
+    } catch (error) {
+      console.error(`handleAptosSignMessage: ${JSON.stringify(error)}`);
+    }
+  }
+
+  public async handleAptosSignTransaction() {
+    try {
+      /* Sample transaction */
+      const tx = {
+        type: "entry_function_payload",
+        function: "0x1::coin::transfer",
+        type_arguments: ["0x1::aptos_coin::AptosCoin"],
+        arguments: [this.account, 1],
+      };
+      if (this.signClient && this.session && this.account) {
+        const response = await this.signClient.request({
+          topic: this.session.topic,
+          chainId:
+            `${process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_APTOS_MAINNET_CHAIN_ID}` ||
+            "",
+          request: {
+            method: "aptos_signTransaction",
+            params: [tx],
+          },
+        });
+        console.info(`handleAptosSignTransaction: ${response}`);
+        // alert("APTOS Sign Transaction");
+      }
+    } catch (error) {
+      console.error(`handleAptosSignTransaction: ${JSON.stringify(error)}`);
+    }
+  }
+
+  public async handleAptosSignAndSubmitTransaction() {
+    try {
+      /* Sample transaction */
+      const tx = {
+        sender: this.account,
+        data: {
+          function: "0x1::coin::transfer",
+          typeArguments: ["0x1::aptos_coin::AptosCoin"],
+          functionArguments: [this.account, 1],
+        },
+      };
+      if (this.signClient && this.session && this.account) {
+        const response = await this.signClient.request({
+          topic: this.session.topic,
+          chainId:
+            `${process.env.REACT_APP_APTOS_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_APTOS_MAINNET_CHAIN_ID}` ||
+            "",
+          request: {
+            method: "aptos_signAndSubmitTransaction",
+            params: [tx],
+          },
+        });
+        console.info(`handleAptosSignAndSubmitTransaction: ${response}`);
+        // alert("APTOS Sign And Submit Transaction");
+      }
+    } catch (error) {
+      console.error(
+        `handleAptosSignAndSubmitTransaction: ${JSON.stringify(error)}`
+      );
     }
   }
 }

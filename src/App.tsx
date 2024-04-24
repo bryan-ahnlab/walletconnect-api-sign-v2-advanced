@@ -70,10 +70,10 @@ function App() {
             padding: "0.5rem",
             wordBreak: "break-all",
           }}
-          onClick={() => curWalletConnect?.handlePersonalSign()}
+          onClick={() => curWalletConnect?.handleAptosSignMessage()}
           disabled={!curWalletConnect}
         >
-          Ethereum Personal Sign
+          Aptos Sign Message
         </button>
         <button
           style={{
@@ -86,10 +86,10 @@ function App() {
             padding: "0.5rem",
             wordBreak: "break-all",
           }}
-          onClick={() => curWalletConnect?.handleEthSign()}
+          onClick={() => curWalletConnect?.handleAptosSignTransaction()}
           disabled={!curWalletConnect}
         >
-          Ethereum Sign
+          Aptos Sign Transaction
         </button>
         <button
           style={{
@@ -102,42 +102,12 @@ function App() {
             padding: "0.5rem",
             wordBreak: "break-all",
           }}
-          onClick={() => curWalletConnect?.handleEthSignTransaction()}
+          onClick={() =>
+            curWalletConnect?.handleAptosSignAndSubmitTransaction()
+          }
           disabled={!curWalletConnect}
         >
-          Ethereum Sign Transaction
-        </button>
-        <button
-          style={{
-            width: "100%",
-            minHeight: "3rem",
-            cursor: "pointer",
-            fontSize: "1rem",
-            fontWeight: "bold",
-            borderRadius: "0.5rem",
-            padding: "0.5rem",
-            wordBreak: "break-all",
-          }}
-          onClick={() => curWalletConnect?.handleEthSignTypedData()}
-          disabled={!curWalletConnect}
-        >
-          Ethereum Sign Typed Data
-        </button>
-        <button
-          style={{
-            width: "100%",
-            minHeight: "3rem",
-            cursor: "pointer",
-            fontSize: "1rem",
-            fontWeight: "bold",
-            borderRadius: "0.5rem",
-            padding: "0.5rem",
-            wordBreak: "break-all",
-          }}
-          onClick={() => curWalletConnect?.handleEthSendTransaction()}
-          disabled={!curWalletConnect}
-        >
-          Ethereum Send Transaction
+          Aptos Sign and Submit Transaction
         </button>
       </div>
     </div>
