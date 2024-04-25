@@ -18,50 +18,37 @@ export class WalletConnect {
           "",
       ], // Add Chain ID
       explorerRecommendedWalletIds: [process.env.REACT_APP_WALLET_ID || ""], // Add ABC Wallet ID
+      explorerExcludedWalletIds: "ALL",
     });
   }
 
   public async getClient() {
     if (this.signClient) {
+      console.info("getClient: Client already exists.");
       return this.signClient;
     }
     try {
+      console.info("getClient: Initializing client");
       this.signClient = await SignClient.init({
         projectId: process.env.REACT_APP_PROJECT_ID || "",
       });
-      await this.subscribeToEvents();
       return this.signClient;
     } catch (error) {
       console.error(`getClient: ${JSON.stringify(error)}`);
-      return this.signClient;
-    }
-  }
-
-  private async subscribeToEvents() {
-    if (!this.signClient)
-      throw Error("Unable to subscribe to events. Client does not exist.");
-    try {
-      this.signClient.on("session_delete", () => {
-        console.info(
-          "The user has disconnected the session from their wallet."
-        );
-        this.reset();
-      });
-    } catch (error) {
-      console.error(`subscribeToEvents: ${JSON.stringify(error)}`);
     }
   }
 
   public async handleConnect() {
     try {
+      console.info("handleConnect: Handling connection.");
       const signClient = await this.getClient();
 
       if (signClient) {
+        console.info("handleConnect: Connecting to the client.");
         const proposalNamespace = {
           [process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""]: {
             methods: [
               "personal_sign",
-              "eth_sign",
               "eth_signTransaction",
               "eth_signTypedData",
               "eth_sendTransaction",
@@ -79,10 +66,16 @@ export class WalletConnect {
         });
 
         if (uri && this.web3Modal) {
+          console.info("handleConnect: Opening modal.");
           this.web3Modal.openModal({ uri });
 
+          console.info("handleConnect: Waiting for approval.");
           const sessionNamespace = await approval();
+
+          console.info("handleConnect: Session approved.");
           this.onSessionConnected(sessionNamespace);
+
+          console.info("handleConnect: Closing modal.");
           this.web3Modal.closeModal();
           console.info(`handleConnect: Connected`);
           // alert("Connected");
@@ -96,9 +89,11 @@ export class WalletConnect {
 
   private onSessionConnected(sessionNamespace: SessionTypes.Struct) {
     try {
-      console.info(`session: ${JSON.stringify(sessionNamespace)}`);
       console.info(
-        `account: ${
+        `onSessionConnected: Session - ${JSON.stringify(sessionNamespace)}`
+      );
+      console.info(
+        `onSessionConnected: Account - ${
           sessionNamespace.namespaces[
             process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL || ""
           ].accounts[0]
@@ -112,14 +107,15 @@ export class WalletConnect {
         .slice(2)
         .join(":");
     } catch (error) {
-      this.reset();
       console.error(`onSessionConnected: ${JSON.stringify(error)}`);
+      this.reset();
     }
   }
 
   public async handleDisconnect() {
     try {
       if (this.signClient && this.session && this.account) {
+        console.info("handleDisconnect: Disconnecting the client.");
         await this.signClient.disconnect({
           topic: this.session.topic,
           reason: { code: 600, message: "Disconnected" } as ErrorResponse,
@@ -134,6 +130,8 @@ export class WalletConnect {
   }
 
   public reset() {
+    console.info("reset: Reset.");
+    this.signClient = null;
     this.session = null;
     this.account = null;
     window.indexedDB.deleteDatabase("WALLET_CONNECT_V2_INDEXED_DB");
@@ -143,7 +141,7 @@ export class WalletConnect {
     try {
       /* Sample transaction */
       const tx = {
-        message: "0xdeadbeaf",
+        message: "Hello World!",
         address: this.account,
       };
       if (this.signClient && this.session && this.account) {
@@ -162,32 +160,6 @@ export class WalletConnect {
       }
     } catch (error) {
       console.error(`handlePersonalSign: ${JSON.stringify(error)}`);
-    }
-  }
-
-  public async handleEthSign() {
-    try {
-      /* Sample transaction */
-      const tx = {
-        address: this.account,
-        message: "0xdeadbeaf",
-      };
-      if (this.signClient && this.session && this.account) {
-        const response = await this.signClient.request({
-          topic: this.session.topic,
-          chainId:
-            `${process.env.REACT_APP_ETHEREUM_IMPROVEMENT_PROPOSAL}:${process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID}` ||
-            "",
-          request: {
-            method: "eth_sign",
-            params: [tx.address, tx.message],
-          },
-        });
-        console.info(`handleEthSign: ${response}`);
-        // alert("ETH Sign");
-      }
-    } catch (error) {
-      console.error(`handleEthSign: ${JSON.stringify(error)}`);
     }
   }
 
@@ -276,7 +248,7 @@ export class WalletConnect {
           domain: {
             name: "Ether Mail",
             version: "1",
-            chainId: 1,
+            chainId: process.env.REACT_APP_KLAYTN_BAOBAB_CHAIN_ID || 1,
             verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
           },
           message: {
